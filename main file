@@ -1,0 +1,150 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib> // For system("clear") or system("cls")
+#include <limits>  // For std::numeric_limits
+using namespace std;
+
+// Function to clear the screen
+void clearScreen() {
+// For Windows
+   #if defined(_WIN32) || defined(_WIN64)
+      system("cls");
+   #else
+      // For Linux or macOS
+      system("clear");
+   #endif
+}
+
+// Function to print the Tic-Tac-Toe board
+void printBoard(const vector<vector<char>> &board) {
+   cout << "  0   1   2\n";
+   for (int i = 0; i < 3; ++i) {
+      cout << i << " ";
+      for (int j = 0; j < 3; ++j) {
+         cout << board[i][j];
+         if (j < 2)
+            cout << " | ";
+      }
+      cout << endl;
+      if (i < 2)
+         cout << " ---|---|---\n";
+   }
+   cout << endl;
+}
+
+// Function to check if a player has won
+bool checkWin(const vector<vector<char>> &board, char player) {
+   // Check rows, columns, and diagonals
+   for (int i = 0; i < 3; ++i) {
+      if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) || // Check rows
+          (board[0][i] == player && board[1][i] == player && board[2][i] == player))
+      { // Check columns
+         return true;
+      }
+   }
+   // Check diagonals
+   if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) || // Top-left to bottom-right
+       (board[0][2] == player && board[1][1] == player && board[2][0] == player)) { // Top-right to bottom-left
+      return true;
+   }
+   return false;
+}
+
+// Function to check if the board is full
+bool isBoardFull(const vector<vector<char>> &board) {
+   for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+         if (board[i][j] == ' ') {
+            return false;
+         }
+      }
+   }
+   return true;
+}
+
+// Function to play the game
+void playTicTacToe() {
+   vector<vector<char>> board(3, vector<char>(3, ' ')); // Initialize empty board
+   int row, col;
+   char currentPlayer = 'X';
+
+   while (true) {
+      clearScreen(); // Clear the screen after each move
+      printBoard(board);
+      cout << "Player " << currentPlayer << "'s turn.\n";
+      cout << "Enter row and column (0, 1, or 2): ";
+      cin >> row >> col;
+
+      // Check if input is valid
+      if (row < 0 || row > 2 || col < 0 || col > 2 || board[row][col] != ' ') {
+         // Print the invalid move message before clearing the screen
+         cout << "Invalid move, try again.\n";
+         // Wait for user to acknowledge the message
+         cin.ignore(); // To ignore any leftover characters in the input buffer
+         cin.get();    // Wait for the user to press Enter (pause)
+         continue;     // Skip the rest of the loop and re-prompt for a valid move
+      }
+
+      // Make the move
+      board[row][col] = currentPlayer;
+
+      // Check if the current player has won
+      if (checkWin(board, currentPlayer)) {
+         clearScreen(); // Clear screen before showing the result
+         printBoard(board);
+         cout << "Player " << currentPlayer << " wins!\n";
+         break;
+      }
+
+      // Check if the board is full (tie)
+      if (isBoardFull(board)) {
+         clearScreen(); // Clear screen before showing the result
+         printBoard(board);
+         cout << "It's a tie!\n";
+         break;
+      }
+
+      // Switch players
+      currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+   }
+
+   // Ask if the user wants to restart or quit
+   char choice;
+   cout << "Do you want to play again? (y/n): ";
+   cin >> choice;
+
+   while (choice != 'y' && choice != 'n') {
+      cout << "Invalid choice! Please enter 'y' to restart or 'n' to quit: ";
+      cin >> choice;
+   }
+
+   if (choice == 'y') {
+      playTicTacToe(); // Restart the game
+   }
+   else {
+      cout << "Thanks for playing! Goodbye.\n";
+   }
+}
+
+int main() {
+   char startChoice;
+
+   // Ask the user if they want to start the game
+   cout << "Welcome to Tic-Tac-Toe!\n";
+   cout << "Do you want to start the game? (y/n): ";
+   cin >> startChoice;
+
+   while (startChoice != 'y' && startChoice != 'n') {
+      cout << "Invalid choice! Please enter 'y' to start or 'n' to quit: ";
+      cin >> startChoice;
+   }
+
+   if (startChoice == 'y') {
+      playTicTacToe(); // Start the game
+   }
+   else {
+      cout << "Thanks for visiting! Goodbye.\n"; // Exit without starting the game
+   }
+
+   return 0;
+}
